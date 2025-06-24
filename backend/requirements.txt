@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+httpx
+pandas
+python-dotenv
+gunicorn  # <-- Thêm dòng này
+uvicorn   # <-- Thêm dòng này để Gunicorn chạy worker

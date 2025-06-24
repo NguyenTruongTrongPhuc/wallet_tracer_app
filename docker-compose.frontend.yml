@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    environment:
+      # Quan trọng: Trỏ đến tên miền công khai của backend server
+      - BACKEND_URL=https://leandix.net/api/v1
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile.frontend # Sẽ tạo file này ở bước sau
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - frontend

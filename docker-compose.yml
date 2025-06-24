@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: wallet_tracer_backend
+    expose:
+      - 8000
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: wallet_tracer_frontend
+    environment:
+      - BACKEND_URL=http://nginx/api/v1
+    expose:
+      - 8501
+
+  nginx:
+    build: ./nginx
+    container_name: wallet_tracer_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+      - frontend
