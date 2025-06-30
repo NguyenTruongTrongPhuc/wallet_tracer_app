@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-# Sử dụng import tuyệt đối
-from backend.api.v1.endpoints import trace
+from .endpoints import trace, ai_analysis
 
 api_router = APIRouter()
-api_router.include_router(trace.router, prefix="/tracing", tags=["Tracing"])
+api_router.include_router(trace.router, prefix="/trace", tags=["Wallet Tracer"])
+api_router.include_router(ai_analysis.router, prefix="/ai", tags=["AI Services"])

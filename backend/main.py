@@ -1,36 +1,44 @@
 import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import os
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-# --- THÊM ĐOẠN CODE NÀY ĐỂ GIẢI QUYẾT VẤN ĐỀ IMPORT ---
-# Thao tác này giúp ứng dụng có thể được chạy từ bất kỳ đâu.
-# Nó sẽ tìm đường dẫn đến thư mục gốc (wallet-tracer-app) và thêm vào sys.path.
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-# ----------------------------------------------------
-
-# Bây giờ chúng ta sử dụng import tuyệt đối từ thư mục gốc
 from backend.api.v1.router import api_router
 
+print("==============================================")
+print("BẮT ĐẦU KIỂM TRA MÔI TRƯỜNG")
 
-app = FastAPI(
-    title="Crypto Wallet Tracing API",
-    description="Một API chuyên sâu để truy vết và phân tích ví Bitcoin.",
-    version="1.0.0"
-)
+current_working_directory = os.getcwd()
+print(f"-> Thư mục làm việc hiện tại (CWD): {current_working_directory}")
+
+env_path = Path(current_working_directory) / '.env'
+print(f"-> Đang tìm file .env tại đường dẫn: {env_path}")
+print(f"-> File .env có tồn tại ở đó không? --- {env_path.exists()} ---")
+
+from backend.core.config import settings
+print("-> Cấu hình Pydantic đã tải được:")
+print(settings.model_dump())
+
+print("KẾT THÚC KIỂM TRA")
+print("==============================================")
+
+
+logging.basicConfig(level=logging.INFO)
+app = FastAPI(title="Wallet Tracer API", version="1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    # Quan trọng: Cho phép tên miền của frontend được gọi đến API này
-    allow_origins=["https://dotoshi.com", "http://dotoshi.com"], 
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
 app.include_router(api_router, prefix="/api/v1")
 
-@app.get("/", tags=["Root"])
+@app.get("/")
 def read_root():
-    return {"message": "Welcome to the Wallet Tracing API!"}
+    return {"message": "Welcome to Wallet Tracer API"}

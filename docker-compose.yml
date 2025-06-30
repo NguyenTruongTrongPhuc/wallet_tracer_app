@@ -3,28 +3,36 @@ version: '3.8'
 services:
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
+      context: . 
+      dockerfile: backend/Dockerfile 
+    ports:
+      - "8001:8000"
+    env_file:
+      - ./.env
+    restart: unless-stopped
     container_name: wallet_tracer_backend
-    expose:
-      - 8000
 
   frontend:
     build:
       context: .
-      dockerfile: frontend/Dockerfile
-    container_name: wallet_tracer_frontend
+      dockerfile: frontend/Dockerfile 
+    ports:
+      - "8502:8501"
     environment:
-      - BACKEND_URL=http://nginx/api/v1
-    expose:
-      - 8501
+      - BACKEND_URL=http://backend:8000/api/v1
+    depends_on:
+      - backend
+    restart: unless-stopped
+    container_name: wallet_tracer_frontend
 
   nginx:
-    build: ./nginx
-    container_name: wallet_tracer_nginx
+    image: nginx:latest
     ports:
-      - "80:80"
-      - "443:443"
+      - "80:80" 
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - backend
       - frontend
+    restart: unless-stopped
+    container_name: wallet_tracer_nginx

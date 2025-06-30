@@ -1,45 +1,46 @@
-import httpx
-from fastapi import APIRouter, Query, Body
-from datetime import date
-
-# --- SỬA LỖI Ở ĐÂY ---
-# Thay thế toàn bộ các đường dẫn tương đối '...' bằng đường dẫn tuyệt đối từ 'backend'
-from backend.services import blockchain_service, analysis_service, ai_service
-from backend.models.trace_models import WalletAnalysis, AIAnalysisRequest
+import logging
+from fastapi import APIRouter, HTTPException
+from backend.core.models.trace_models import TraceRequest, FullAnalysisResponse
+from backend.services import analysis_service
 
 router = APIRouter()
 
-@router.get("/trace/{address}", response_model=WalletAnalysis)
-async def trace_wallet_address(
-    address: str,
-    start_date: date = Query(..., description="Ngày bắt đầu, định dạng YYYY-MM-DD"),
-    end_date: date = Query(..., description="Ngày kết thúc, định dạng YYYY-MM-DD")
-):
-    """
-    Endpoint chính để truy vết một địa chỉ ví.
-    Nó tổng hợp các bước: fetch -> analyze -> respond.
-    """
-    async with httpx.AsyncClient() as client:
-        # Fetch raw data in parallel
-        raw_info = await blockchain_service.fetch_address_data(client, address)
-        raw_txs = await blockchain_service.fetch_transactions_for_address(client, address)
-    
-    # Analyze data
-    analysis_result = analysis_service.process_and_analyze_data(
-        address, raw_info, raw_txs, str(start_date), str(end_date)
-    )
-    
-    return analysis_result
-
-@router.post("/analyze-ai")
-async def analyze_wallet_with_ai(
-    request: AIAnalysisRequest = Body(...)
-):
-    """
-    Endpoint nhận dữ liệu ví và dùng OpenAI để phân tích.
-    """
-    analysis_content = await ai_service.get_ai_analysis(
-        wallet_data=request.wallet_data,
-        openai_api_key=request.openai_api_key
-    )
-    return {"analysis": analysis_content}
+@router.post("/", response_model=FullAnalysisResponse)
+async def trace_wallet(request: TraceRequest) -> FullAnalysisResponse:
+    ####################################################################
+    ##                                                                ##
+    ##  FUNCTION: trace_wallet                                        ##
+    ##                                                                ##
+    ##  - Purpose: This is the main endpoint for the "Wallet Tracer"  ##
+    ##    feature. It receives a wallet address and a date range,     ##
+    ##    then triggers the full analysis process.                    ##
+    ##                                                                ##
+    ##  - Input: Receives a POST request to its root path (e.g.,      ##
+    ##    /api/v1/trace/). The request body must be a JSON object      ##
+    ##    matching the `TraceRequest` model, containing:              ##
+    ##    {"address": "...", "start_date": "...", "end_date": "..."}. ##
+    ##                                                                ##
+    ##  - Process:                                                    ##
+    ##    1. It validates the incoming request using the              ##
+    ##       `TraceRequest` Pydantic model.                           ##
+    ##    2. It calls the `perform_full_analysis` function from the   ##
+    ##       `analysis_service`, which handles all the heavy lifting. ##
+    ##    3. It includes error handling to catch any exceptions       ##
+    ##       during the analysis and returns an appropriate HTTP      ##
+    ##       error.                                                   ##
+    ##                                                                ##
+    ##  - Output: On success, it returns a `FullAnalysisResponse`     ##
+    ##    object, which FastAPI automatically converts to a JSON      ##
+    ##    response containing the complete wallet analysis.           ##
+    ##                                                                ##
+    ####################################################################
+    try:
+        analysis_result = analysis_service.perform_full_analysis(
+            address=request.address,
+            start_date_str=request.start_date,
+            end_date_str=request.end_date
+        )
+        return analysis_result
+    except Exception as e:
+        logging.error(f"Lỗi endpoint: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Lỗi máy chủ nội bộ khi phân tích: {e}")
