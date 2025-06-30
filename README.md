@@ -2,8 +2,6 @@
 
 **Wallet Tracer & Monitoring Suite** là một bộ công cụ phân tích và giám sát ví Bitcoin chuyên sâu, được xây dựng bằng Python. Ứng dụng kết hợp giữa phân tích dữ liệu on-chain, các thuật toán Heuristics để phát hiện rủi ro, và sức mạnh của Trí tuệ Nhân tạo (GPT-4) để cung cấp các báo cáo tình báo tài chính chi tiết.
 
-![Giao diện Dashboard Giám Sát](https://i.imgur.com/dabcbe.png)
-
 ---
 
 ## 🚀 Các Tính Năng Chính
@@ -51,7 +49,7 @@ Cách dễ nhất và ổn định nhất để chạy ứng dụng này là s�
 **1. Sao chép (Clone) Repository:**
 Mở terminal và chạy lệnh sau:
 ```bash
-git clone [https://github.com/your-username/your-repository-name.git](https://github.com/your-username/your-repository-name.git)
+git clone [https://github.com/NguyenTruongTrongPhuc/wallet_tracer_app](https://github.com/NguyenTruongTrongPhuc/wallet_tracer_app)
 cd your-repository-name
 
 2. Tạo file Biến Môi trường (.env):
