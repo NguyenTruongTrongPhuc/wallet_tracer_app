@@ -1,10 +1,12 @@
-fastapi
-uvicorn
+fastapi[all]
+gunicorn
 pydantic
 pydantic-settings
 httpx
 pandas
 python-dotenv
-gunicorn
-uvicorn
 requests
+authlib
+python-jose[cryptography]
+itsdangerous
+web3

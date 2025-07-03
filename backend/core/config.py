@@ -10,7 +10,11 @@ class Settings(BaseSettings):
     OPENAI_API_BASE_URL: str = "https://api.openai.com/v1"
     
     OPENAI_API_KEY: str = ""
-
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+    SESSION_SECRET_KEY: str = ""
+    GITHUB_CLIENT_ID: str = ""
+    GITHUB_CLIENT_SECRET: str = ""
     class Config:
         env_file = ".env"
         env_file_encoding = 'utf-8'

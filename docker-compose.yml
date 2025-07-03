@@ -20,6 +20,9 @@ services:
       - "8502:8501"
     environment:
       - BACKEND_URL=http://backend:8000/api/v1
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     depends_on:
       - backend
     restart: unless-stopped

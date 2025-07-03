@@ -117,3 +117,20 @@ def generate_ai_report(address: str, start_date: str, end_date: str) -> dict:
         raise Exception(f"Lỗi từ server khi tạo báo cáo AI: {e.response.json().get('detail', e.response.text)}")
     except requests.exceptions.RequestException as e:
         raise Exception(f"Lỗi kết nối đến backend cho báo cáo AI: {e}")
+    
+def send_wallet_address(address: str):
+    """Gửi địa chỉ ví đến backend để xử lý."""
+    api_url = f"{BACKEND_URL}/auth/login/web3"
+    try:
+        response = requests.post(
+            api_url,
+            json={"address": address},
+            timeout=30 # Thêm timeout để tránh chờ đợi quá lâu
+        )
+        response.raise_for_status()  # Dòng này sẽ báo lỗi nếu status code là 4xx hoặc 5xx
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        # Bắt các lỗi liên quan đến network hoặc HTTP status code
+        print(f"Lỗi khi gọi API {api_url}: {e}")
+        # Bạn có thể trả về một dictionary lỗi để xử lý ở giao diện
+        return {"status": "error", "message": str(e)}
